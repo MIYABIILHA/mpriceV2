@@ -1,4 +1,3 @@
-
 import { CalculatorInputs, CalculationResult } from '../types';
 
 /**
@@ -48,11 +47,10 @@ export const calculateProfit = (inputs: CalculatorInputs): CalculationResult => 
   const marketingSponsorship = Math.round(costPrice * marketingRate);
 
   // 5. Warehousing Fee
-  // Fixed logic requested: Use 6th month rate (0.7)
-  // Rate calculation: Month 1 (0.2) -> Month 6 = 0.2 + (5 * 0.1) = 0.7
+  // Fixed logic: Always use 6th month rate (0.7)
   const tsai = calculateTsai(length, width, height);
   const dailyRate = 0.7; 
-  const billableDays = storageDays; // Simplified: no exemption logic
+  const billableDays = storageDays; 
   
   const warehousingFee = Math.round(tsai * dailyRate * billableDays);
 

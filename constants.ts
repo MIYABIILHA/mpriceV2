@@ -1,9 +1,8 @@
-
 import { Language } from './types';
 
 export const DEFAULT_INPUTS = {
   sellingPrice: 1000,
-  costMarginPercent: 25,
+  costMarginPercent: 25, // Default set to 25% as requested
   manualShippingFee: 60,
   length: 10,
   width: 10,

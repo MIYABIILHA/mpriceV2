@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RechartsTooltip, Legend } from 'recharts';
 import { CalculationResult, Language, CostBreakdownItem } from '../types';
@@ -13,15 +12,21 @@ interface SummaryCardProps {
 export const SummaryCard: React.FC<SummaryCardProps> = ({ result, inputs, language }) => {
   const t = TRANSLATIONS[language];
 
-  // Map data to include 'name' property for Recharts Legend to display correctly
-  const data: CostBreakdownItem[] = [
+  // Prepare data for the chart
+  const fullData: CostBreakdownItem[] = [
     { id: 'costPrice', name: t.results.costPrice, value: result.costPrice, color: COLORS.costPrice },
     { id: 'salesBonus', name: t.results.salesBonus, value: result.salesBonus, color: COLORS.salesBonus, formulaDisplay: `${inputs.sellingPrice} x 3%` },
     { id: 'platformFee', name: t.results.platformFee, value: result.platformFee, color: COLORS.platformFee },
     { id: 'marketing', name: t.results.marketing, value: result.marketingSponsorship, color: COLORS.marketing },
     { id: 'warehousing', name: t.results.warehousing, value: result.warehousingFee, color: COLORS.warehousing, formulaDisplay: `${result.tsai} Tsai x $${result.dailyStorageRate} x ${result.billableDays} Days` },
     { id: 'shipping', name: t.results.shipping, value: result.shippingFee, color: COLORS.shipping },
-  ].filter(item => item.value > 0);
+  ];
+
+  // Filter for display in the list (hide 0 values)
+  const displayData = fullData.filter(item => item.value > 0);
+  
+  // Use displayData for the chart as well to avoid empty segments, but ensure colors are preserved
+  const chartData = displayData;
 
   const formatCurrency = (val: number) => {
     return new Intl.NumberFormat('zh-TW', { style: 'currency', currency: 'TWD', minimumFractionDigits: 0 }).format(val);
@@ -62,31 +67,31 @@ export const SummaryCard: React.FC<SummaryCardProps> = ({ result, inputs, langua
           {t.results.costStructure}
         </h3>
         
-        <div className="h-64 w-full mb-6">
+        <div className="h-64 w-full mb-6 relative" style={{ minHeight: '250px' }}>
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
-                data={data}
+                data={chartData}
                 cx="50%"
                 cy="50%"
                 innerRadius={60}
                 outerRadius={80}
                 paddingAngle={2}
                 dataKey="value"
-                nameKey="name" // Explicitly use 'name' key for Legend labels
+                nameKey="name"
               >
-                {data.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
+                {chartData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.color} strokeWidth={0} />
                 ))}
               </Pie>
               <RechartsTooltip formatter={(value: number) => formatCurrency(value)} />
-              <Legend iconType="circle" wrapperStyle={{ fontSize: '12px' }} />
+              <Legend verticalAlign="bottom" height={36} iconType="circle" />
             </PieChart>
           </ResponsiveContainer>
         </div>
 
         <div className="space-y-3">
-          {data.map((item) => (
+          {displayData.map((item) => (
             <div key={item.id} className="flex flex-col border-b border-gray-100 last:border-0 pb-2 last:pb-0">
               <div className="flex justify-between items-center text-sm">
                 <div className="flex items-center gap-2">
